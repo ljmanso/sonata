@@ -17,7 +17,7 @@ import random
 from dgl import DGLGraph
 import dgl
 
-limit = 149999  # 31191
+limit = 149999
 
 path_saves = 'saves/'
 

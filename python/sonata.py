@@ -72,9 +72,10 @@ class HumanMovementRandomiser(object):
         return False
 
 class SODA():
-    def __init__(self, proxy_map, data, coppelia):
+    def __init__(self, proxy_map, data):
         super(SODA, self).__init__()
-        self.coppelia = coppelia
+        self.coppelia = CoppeliaSimAPI(['scenes/'])
+        self.coppelia.load_scene('dataset.ttt', headless=True)
         self.goal_found = 0
         self.ini_data = data
         self.data = data
@@ -83,6 +84,8 @@ class SODA():
         self.tables = []
         self.plants = []
         self.laptops = []
+        self.walls = []
+        self.goal = None
 
         self.humans_IND = []
         self.tables_IND = []
@@ -105,10 +108,16 @@ class SODA():
         self.max_tables = None
         self.max_laptops = None
         self.max_relations = None
+
+        self.coppelia.start()
+
+    def __del__(self):
+        print('SONATA destructor')
+        self.coppelia.shutdown()
         
-        #self.robot = None
        
     def room_setup(self, min_humans, min_wandHumans, min_plants, min_tables, min_relations, max_humans, max_wandHumans, max_plants, max_tables, max_relations):
+        self.coppelia.remove_objects(self.humans,self.tables,self.laptops,self.plants, self.goal,self.walls)
         
         self.interacting_humans = []
         self.min_humans = min_humans
@@ -483,7 +492,11 @@ class SODA():
 
         return self.data, self.wandering_humans
 
+    def get_simulation_timestep(self):
+        return self.coppelia.get_simulation_timestep()
+
     def soda_compute(self,people, objects, walls, goals):
+        self.coppelia.step()
         #Get robot's position
         robot_position = self.robot.get_position()
         robot_orientation = self.robot.get_orientation()

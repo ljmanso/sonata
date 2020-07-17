@@ -35,8 +35,7 @@ import _pickle as pickle
 
 sys.path.append('../..')
 
-from coppeliasimapi2 import CoppeliaSimAPI, Human, YouBot
-from soda import SODA
+from sonata import SODA
 
 from genericworker import *
 
@@ -49,7 +48,6 @@ def please_exit(sig, frame):
 class SpecificWorker(GenericWorker):
     def __init__(self, proxy_map):
         super(SpecificWorker, self).__init__(proxy_map)
-        self.coppelia = CoppeliaSimAPI(['scenes/'])
 
         self.data = {
         'walls': [],
@@ -60,17 +58,15 @@ class SpecificWorker(GenericWorker):
         'simulator_mutex': threading.RLock()
         }
 
-        self.coppelia.load_scene('dataset.ttt', headless=True)
         
         signal.signal(signal.SIGINT, please_exit)
 
-        self.soda = SODA(proxy_map, self.data, self.coppelia)
+        self.soda = SODA(proxy_map, self.data)
         self.min_max_data = {"min_humans":0, "max_humans":4,
                              "min_wandering_humans":0, "max_wandering_humans":4, 
                              "min_tables":0, "max_tables":4, 
                              "min_plants":0, "max_plants":4,
                              "min_relations":0, "max_relations":4}
-                   
                    
         self.data, self.wandering_humans = self.soda.room_setup(self.min_max_data['min_humans'],
                                                                 self.min_max_data['min_wandering_humans'],
@@ -91,16 +87,12 @@ class SpecificWorker(GenericWorker):
         self.end_simulation = False
 
 
-        self.coppelia.start()
-
-
-
         self.vision_sensor = Object.get_object('Vision_sensor')
 
 
     def __del__(self):
         print('SpecificWorker destructor')
-        self.coppelia.shutdown()
+        del self.soda
 
     def setParams(self, params):
         return True
@@ -124,7 +116,6 @@ class SpecificWorker(GenericWorker):
             self.data['simulator_mutex'].acquire()
 
             # Simulation step
-            self.coppelia.step()
             self.data, people, objects, interactions, walls, goal = self.soda.soda_compute(people, objects, walls, goal)
             self.data['simulator_mutex'].release()
             #
@@ -151,7 +142,7 @@ class SpecificWorker(GenericWorker):
             # vision.capture_rgb()
             # print (time.time()-ta)
             time_spent = time.time() - time_zero
-            time_to_sleep = self.soda.coppelia.get_simulation_timestep() - time_spent
+            time_to_sleep = self.soda.get_simulation_timestep() - time_spent
             if time_to_sleep < 0:
                 time_to_sleep = 0
         return True
@@ -258,7 +249,6 @@ class SpecificWorker(GenericWorker):
         self.min_max_data = ast.literal_eval(scene)
         print(self.min_max_data)
         self.soda.data['simulator_mutex'].acquire()
-        self.coppelia.remove_objects(self.soda.humans,self.soda.tables,self.soda.laptops,self.soda.plants, self.soda.goal,self.soda.walls)
         self.data, self.wandering_humans = self.soda.room_setup(self.min_max_data['min_humans'],
                                                                 self.min_max_data['min_wandering_humans'],
                                                                 self.min_max_data['min_plants'],

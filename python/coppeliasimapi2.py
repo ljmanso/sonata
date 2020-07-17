@@ -235,7 +235,8 @@ class CoppeliaSimAPI(PyRep):
         for i in range(len(plants_list)):
             plants_list[i].remove()
 
-        goal.remove()
+        if goal is not None:
+            goal.remove()
         # robot.remove()
 
 

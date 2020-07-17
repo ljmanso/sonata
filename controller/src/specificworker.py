@@ -41,11 +41,6 @@ from PySide2.QtGui import QPixmap, QImage
 from PySide2.QtCore import QSettings
 
 import _pickle as pickle
-# If RoboComp was compiled with Python bindings you can use InnerModel in Python
-# sys.path.append('/opt/robocomp/lib')
-# import librobocomp_qmat
-# import librobocomp_osgviewer
-# import librobocomp_innermodel
 import json
 from PySide2.QtWidgets import (QLabel, QLineEdit, QPushButton, QApplication,
     QVBoxLayout, QDialog, QWidget)
@@ -61,7 +56,7 @@ class SpecificWorker(GenericWorker):
         os.system('bash ../joystick.sh &')
         os.system('bash ../simulator.sh &')
         self.timer.timeout.connect(self.compute)
-        self.TEST_MODE = False
+        self.TEST_MODE = False#True
         self.i_frame = 0
         if self.TEST_MODE:
             self.model = SocNavAPI('.', None)
@@ -246,9 +241,6 @@ class SpecificWorker(GenericWorker):
 
         proximity = math.sqrt(sum([(a - b) ** 2 for a, b in zip(self.robot_coordinates, self.goal_coordinates)]))
         if proximity <= self.threshold:
-#            time_str = '{0:%Y-%m-%d__%H:%M:%S}'.format(datetime.datetime.now())
-#            with open(f'../{self.ui.contributor.text()}__{time_str}.json', 'w') as fp:
-#                json.dump(self.updates_list, fp, indent=4, sort_keys=True)
             self.omnirobot_proxy.setSpeedBase(0, 0, 0)
 #            self.regenerate_slot()
             return
