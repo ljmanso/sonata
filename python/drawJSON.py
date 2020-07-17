@@ -139,7 +139,7 @@ def print_scene(frame):
 frame_number = 0
 frame = load_json_frame(frame_number)
 print_scene(frame)
-while True: #cv.getWindowProperty('Display of the room', cv.WND_PROP_VISIBLE) >= 1:
+while cv.getWindowProperty('Display of the room', cv.WND_PROP_VISIBLE) >= 1:
     k = cv.waitKey(20)
     if k == 27:  # Esc
         print()

@@ -161,15 +161,10 @@ class MyView(QtWidgets.QGraphicsView):
             rel_type = self.graph.edata['rel_type'][e_id].item()
             colour, width = self.type_to_colour_width(rel_type, type_a, type_b)
 
-            if colour is None or width is None:
-                print("Error for link between these two types:")
-                print(type_a)
-                print(type_b)
-                sys.exit(0)
-
-            pen.setColor(colour)
-            pen.setWidth(width)
-            self.scene.addLine(ax, ay, bx, by, pen=pen)
+            if colour is not None and width is not None:
+                pen.setColor(colour)
+                pen.setWidth(width)
+                self.scene.addLine(ax, ay, bx, by, pen=pen)
 
     @staticmethod
     def type_to_colour_width(rel_type, type1, type2):
