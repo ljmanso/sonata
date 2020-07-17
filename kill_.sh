@@ -1,0 +1,1 @@
+ kill -9 `ps ax | grep 'python3 python' | awk '{print $1}'`
